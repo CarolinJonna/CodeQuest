@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: #05091a; min-height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.sky { position: fixed; inset: 0; background: radial-gradient(ellipse at 30% 20%, #0d1b4b 0%, #05091a 60%); z-index: 0; }
+.stars { position: fixed; inset: 0; z-index: 1; }
+.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite var(--delay); }
+@keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
+.moon { position: fixed; top: 48px; right: 90px; width: 110px; height: 110px; z-index: 2; animation: moonFloat 6s ease-in-out infinite; }
+@keyframes moonFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+.moon-circle { width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff9c4, #f5d76e 40%, #e8b84b 80%); box-shadow: 0 0 40px rgba(245,215,110,0.5), 0 0 80px rgba(245,215,110,0.2), inset -18px -10px 0 rgba(0,0,0,0.08); position: relative; }
+.moon-circle::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.07); top: 22px; left: 60px; box-shadow: 12px 32px 0 rgba(0,0,0,0.06), -8px 52px 0 8px rgba(0,0,0,0.04); }
+.moon-glow { position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(245,215,110,0.15) 0%, transparent 70%); animation: glowPulse 4s ease-in-out infinite; }
+@keyframes glowPulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+.cloud { position: fixed; z-index: 2; opacity: 0.12; animation: cloudDrift linear infinite; }
+.cloud svg { fill: #8cb4ff; }
+@keyframes cloudDrift { from { transform: translateX(0); } to { transform: translateX(120px); } }
+.card-wrap { position: relative; z-index: 10; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+.card { background: #101c3a; border: 1.5px solid rgba(130,170,255,0.18); border-radius: 28px; padding: 44px 40px 40px; width: 380px; text-align: center; position: relative; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 64px rgba(0,0,10,0.7), 0 0 60px rgba(80,130,255,0.07); animation: cardIn .6s cubic-bezier(.22,1,.36,1) both; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(40px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.card::before { content: ''; position: absolute; top: -1px; left: 50px; right: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(130,180,255,0.6), transparent); border-radius: 50%; }
+.rabbit-wrap { position: absolute; bottom: calc(100% - 18px); left: 50%; transform: translateX(-50%); width: 120px; animation: rabbitBounce 2.8s ease-in-out infinite; }
+@keyframes rabbitBounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-10px); } }
+.rabbit-bubble { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #1e3a6e; border: 1px solid rgba(130,170,255,0.3); border-radius: 12px; padding: 7px 14px; font-size: 12px; font-weight: 700; color: #a8c8ff; white-space: nowrap; animation: bubblePop .5s .8s cubic-bezier(.34,1.56,.64,1) both; z-index: 20; }
+.rabbit-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #1e3a6e; }
+@keyframes bubblePop { from { opacity: 0; transform: translateX(-50%) scale(0.6); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+h1 { font-family: 'Fredoka One', cursive; font-size: 34px; color: #e8f2ff; letter-spacing: 1px; margin-top: 12px; margin-bottom: 6px; }
+.tagline { font-size: 14px; color: #5a7aaa; font-weight: 600; margin-bottom: 32px; letter-spacing: 0.3px; }
+.btn { display: block; width: 100%; padding: 15px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; border: none; transition: transform .15s, box-shadow .15s, filter .15s; text-decoration: none; letter-spacing: 0.3px; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(0.98); }
+.btn-primary { background: linear-gradient(135deg, #4a90ff, #6a5aff); color: #fff; box-shadow: 0 8px 24px rgba(74,144,255,0.35); margin-bottom: 14px; }
+.btn-primary:hover { box-shadow: 0 12px 32px rgba(74,144,255,0.5); filter: brightness(1.08); }
+.btn-outline { background: transparent; color: #7aabff; border: 2px solid rgba(74,144,255,0.35); }
+.btn-outline:hover { background: rgba(74,144,255,0.08); border-color: rgba(74,144,255,0.6); }
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: #2a4060; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(74,144,255,0.12); }
+.page-overlay { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(5,9,26,0.85); backdrop-filter: blur(6px); animation: overlayIn .3s ease both; }
+.page-overlay.show { display: flex; }
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+.form-card { background: #0e1a36; border: 1.5px solid rgba(130,170,255,0.18); border-radius: 28px; padding: 44px 40px; width: 380px; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.7); animation: formCardIn .45s cubic-bezier(.22,1,.36,1) both; }
+@keyframes formCardIn { from { opacity: 0; transform: scale(0.94) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.form-card::before { content: ''; position: absolute; top: -1px; left: 50px; right: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(130,180,255,0.5), transparent); }
+.page-title { font-family: 'Fredoka One', cursive; font-size: 28px; color: #e8f2ff; margin-bottom: 6px; }
+.page-sub { font-size: 13px; color: #4a6a90; margin-bottom: 28px; font-weight: 600; }
+.close-btn { position: absolute; top: 18px; right: 20px; background: rgba(74,144,255,0.1); border: 1px solid rgba(74,144,255,0.2); color: #5a8acc; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.close-btn:hover { background: rgba(74,144,255,0.2); color: #8ab8ff; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 800; color: #4a6a90; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 7px; }
+.field input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(74,144,255,0.15); border-radius: 12px; color: #d0e4ff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; outline: none; transition: border-color .2s, box-shadow .2s; }
+.field input::placeholder { color: #2a4060; }
+.field input:focus { border-color: rgba(74,144,255,0.5); box-shadow: 0 0 0 3px rgba(74,144,255,0.08); }
+.switch-link { text-align: center; margin-top: 20px; font-size: 13px; color: #4a6a90; font-weight: 600; }
+.switch-link span { color: #5a9aff; cursor: pointer; font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+.switch-link span:hover { color: #8abeff; }
+.error-msg { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #f87171; margin-bottom: 16px; display: none; }
+.error-msg.show { display: block; }
+.page-label { position: fixed; top: 0; left: 0; right: 0; text-align: center; padding: 14px; font-family: 'Fredoka One', cursive; font-size: 15px; letter-spacing: 2px; color: rgba(130,170,255,0.3); z-index: 5; pointer-events: none; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="moon"><div class="moon-glow"></div><div class="moon-circle"></div></div>
+<div class="cloud" style="top:18%;left:-60px;animation-duration:35s;animation-delay:-10s;">
+  <svg width="160" height="50" viewBox="0 0 160 50"><ellipse cx="80" cy="35" rx="75" ry="18"/><ellipse cx="55" cy="28" rx="38" ry="22"/><ellipse cx="105" cy="25" rx="32" ry="20"/></svg>
+</div>
+<div class="page-label">✦ CODEQUEST ✦</div>
+
+<div class="card-wrap">
+  <div class="card">
+    <div class="rabbit-wrap">
+      <div class="rabbit-bubble">Let's learn to code! 🚀</div>
+      <svg viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg" width="120">
+        <ellipse cx="38" cy="30" rx="11" ry="28" fill="#c8d8f8"/><ellipse cx="38" cy="30" rx="6" ry="22" fill="#f4b8cc"/>
+        <ellipse cx="82" cy="30" rx="11" ry="28" fill="#c8d8f8"/><ellipse cx="82" cy="30" rx="6" ry="22" fill="#f4b8cc"/>
+        <ellipse cx="60" cy="66" rx="35" ry="32" fill="#ddeaff"/>
+        <circle cx="47" cy="60" r="7" fill="#fff"/><circle cx="73" cy="60" r="7" fill="#fff"/>
+        <circle cx="49" cy="59" r="4" fill="#1a2a4a"/><circle cx="75" cy="59" r="4" fill="#1a2a4a"/>
+        <circle cx="51" cy="57" r="1.5" fill="#fff"/><circle cx="77" cy="57" r="1.5" fill="#fff"/>
+        <ellipse cx="40" cy="70" rx="8" ry="5" fill="#f9b8cc" opacity=".5"/><ellipse cx="80" cy="70" rx="8" ry="5" fill="#f9b8cc" opacity=".5"/>
+        <ellipse cx="60" cy="72" rx="4" ry="3" fill="#f472b6"/>
+        <path d="M55 76 Q60 82 65 76" stroke="#d460a0" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <ellipse cx="60" cy="108" rx="28" ry="22" fill="#c8d8f8"/>
+        <ellipse cx="60" cy="110" rx="16" ry="13" fill="#ddeaff" opacity=".7"/>
+        <ellipse cx="30" cy="103" rx="9" ry="16" fill="#c8d8f8" transform="rotate(-20 30 103)"/>
+        <ellipse cx="90" cy="103" rx="9" ry="16" fill="#c8d8f8" transform="rotate(20 90 103)"/>
+        <text x="52" y="113" font-size="10" fill="#7aabff" opacity=".7">★</text>
+      </svg>
+    </div>
+    <h1>CodeQuest</h1>
+    <p class="tagline">Bite-sized coding lessons — level up daily ✦</p>
+    <button class="btn btn-primary" onclick="showPage('signup')">Get Started for Free</button>
+    <div class="divider">OR</div>
+    <button class="btn btn-outline" onclick="showPage('login')">I Already Have an Account</button>
+  </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div class="page-overlay" id="page-login">
+  <div class="form-card">
+    <button class="close-btn" onclick="closePage('login')">✕</button>
+    <p class="page-title">Welcome back 👋</p>
+    <p class="page-sub">Log in to continue your streak</p>
+    <div class="error-msg" id="login-error"></div>
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+    <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+    <button class="btn btn-primary" id="login-btn" style="margin-top:8px;" onclick="doLogin()">Log In</button>
+    <div class="switch-link">Don't have an account? <span onclick="switchPage('login','signup')">Sign Up</span></div>
+  </div>
+</div>
+
+<!-- SIGNUP OVERLAY -->
+<div class="page-overlay" id="page-signup">
+  <div class="form-card">
+    <button class="close-btn" onclick="closePage('signup')">✕</button>
+    <p class="page-title">Create Account ✦</p>
+    <p class="page-sub">Start your coding journey today</p>
+    <div class="error-msg" id="signup-error"></div>
+    <div class="field"><label>Full Name</label><input type="text" id="signup-name" placeholder="Ada Lovelace"/></div>
+    <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
+    <div class="field"><label>Password</label><input type="password" id="signup-password" placeholder="Create a strong password"/></div>
+    <button class="btn btn-primary" id="signup-btn" style="margin-top:8px;" onclick="doSignup()">Create My Account</button>
+    <div class="switch-link">Already have an account? <span onclick="switchPage('signup','login')">Log In</span></div>
+  </div>
+</div>
+
+<script>
+// Stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 160; i++) {
+  const s = document.createElement('div'); s.className = 'star';
+  const size = Math.random() * 2.5 + 0.5;
+  s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--delay:-${(Math.random()*6).toFixed(1)}s;opacity:${Math.random()*0.4};`;
+  starsEl.appendChild(s);
+}
+
+function showPage(name) { document.getElementById('page-' + name).classList.add('show'); }
+function closePage(name) { document.getElementById('page-' + name).classList.remove('show'); }
+function switchPage(from, to) { closePage(from); setTimeout(() => showPage(to), 180); }
+document.querySelectorAll('.page-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('show'); });
+});
+
+// Enter key triggers buttons
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('signup-password').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideError(id) { document.getElementById(id).classList.remove('show'); }
+
+async function doLogin() {
+  hideError('login-error');
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn      = document.getElementById('login-btn');
+  if (!email || !password) { showError('login-error', 'Please fill in all fields.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Logging in...';
+  try {
+    const res  = await fetch('api/auth.php?action=login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Store user in localStorage for quick UI access
+      localStorage.setItem('cq_user', JSON.stringify(data.user));
+      localStorage.setItem('cq_xp',       data.user.xp);
+      localStorage.setItem('cq_streak',   data.user.streak);
+      localStorage.setItem('cq_gems',     data.user.gems);
+      localStorage.setItem('cq_lessons',  data.user.lessons_done);
+      localStorage.setItem('cq_progress', data.user.progress);
+      localStorage.setItem('cq_lang',     data.user.selected_lang);
+      window.location.href = 'homepage.html';
+    } else {
+      showError('login-error', data.message || 'Login failed.');
+    }
+  } catch (e) {
+    showError('login-error', 'Server error — make sure XAMPP is running.');
+  }
+  btn.disabled = false; btn.textContent = 'Log In';
+}
+
+async function doSignup() {
+  hideError('signup-error');
+  const full_name = document.getElementById('signup-name').value.trim();
+  const email     = document.getElementById('signup-email').value.trim();
+  const password  = document.getElementById('signup-password').value;
+  const btn       = document.getElementById('signup-btn');
+  if (!full_name || !email || !password) { showError('signup-error', 'Please fill in all fields.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  try {
+    const res  = await fetch('api/auth.php?action=signup', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name, email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('cq_user', JSON.stringify(data.user));
+      localStorage.setItem('cq_xp',       0);
+      localStorage.setItem('cq_streak',   0);
+      localStorage.setItem('cq_gems',     0);
+      localStorage.setItem('cq_lessons',  0);
+      localStorage.setItem('cq_progress', 0);
+      localStorage.setItem('cq_lang',     'Python');
+      window.location.href = 'language-select.html';
+    } else {
+      showError('signup-error', data.message || 'Signup failed.');
+    }
+  } catch (e) {
+    showError('signup-error', 'Server error — make sure XAMPP is running.');
+  }
+  btn.disabled = false; btn.textContent = 'Create My Account';
+}
+
+// Auto-redirect if already logged in
+(async () => {
+  try {
+    const res = await fetch('api/auth.php?action=me');
+    const data = await res.json();
+    if (data.success) window.location.href = 'homepage.html';
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

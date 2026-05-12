@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeQuest — Choose Your Language</title>
+<script src="cq.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #05091a;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.sky {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, #0d1b4b 0%, #05091a 60%);
+  z-index: 0;
+}
+.stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+.star {
+  position: absolute; background: #fff; border-radius: 50%;
+  animation: twinkle var(--d) ease-in-out infinite var(--delay);
+}
+@keyframes twinkle {
+  0%,100%{opacity:0.15;transform:scale(1);}
+  50%{opacity:0.9;transform:scale(1.6);}
+}
+
+.moon {
+  position: fixed; top: 40px; right: 70px;
+  width: 90px; height: 90px; z-index: 2;
+  animation: mfloat 6s ease-in-out infinite;
+}
+@keyframes mfloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+.moon-c {
+  width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff9c4,#f5d76e 40%,#e8b84b 80%);
+  box-shadow:0 0 40px rgba(245,215,110,.45),0 0 80px rgba(245,215,110,.15),inset -14px -8px 0 rgba(0,0,0,.08);
+}
+
+/* ── PAGE LABEL ── */
+.page-label {
+  position: fixed; top: 0; left: 0; right: 0;
+  text-align: center; padding: 14px;
+  font-family: 'Fredoka One', cursive; font-size: 15px;
+  letter-spacing: 2px; color: rgba(130,170,255,0.3);
+  z-index: 5; pointer-events: none;
+}
+
+/* ── MAIN LAYOUT ── */
+.main-wrap {
+  position: relative; z-index: 10;
+  display: flex; align-items: flex-end; gap: 0;
+  max-width: 820px; width: 100%;
+  animation: pageIn .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes pageIn {
+  from{opacity:0;transform:translateY(40px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── RABBIT SIDE ── */
+.rabbit-side {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding-bottom: 20px;
+  margin-right: -10px;
+  z-index: 2;
+}
+.rabbit-bubble {
+  background: #1e3a6e;
+  border: 1px solid rgba(130,170,255,.3);
+  border-radius: 14px 14px 14px 4px;
+  padding: 10px 14px;
+  font-size: 12px; font-weight: 800; color: #a8c8ff;
+  max-width: 130px; text-align: center; line-height: 1.4;
+  margin-bottom: 10px;
+  animation: bobBubble 3s ease-in-out infinite;
+}
+@keyframes bobBubble { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+.rabbit-bubble::after {
+  content:''; position:absolute;
+  /* no absolute tail here, kept simple */
+}
+.rabbit-svg { animation: rabbitStand 3s ease-in-out infinite; }
+@keyframes rabbitStand {
+  0%,100%{transform:translateY(0) rotate(-1deg);}
+  50%{transform:translateY(-8px) rotate(1deg);}
+}
+
+/* ── CARD ── */
+.card {
+  flex: 1;
+  background: #101c3a;
+  border: 1.5px solid rgba(130,170,255,.18);
+  border-radius: 28px;
+  padding: 38px 36px 36px;
+  box-shadow: 0 0 60px rgba(80,130,255,.07), 0 24px 64px rgba(0,0,0,.65);
+  position: relative;
+}
+.card::before {
+  content:''; position:absolute;
+  top:-1px;left:60px;right:60px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(130,180,255,.5),transparent);
+}
+
+.card-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 28px; color: #e8f2ff;
+  margin-bottom: 6px;
+}
+.card-sub {
+  font-size: 13px; color: #4a6a90;
+  font-weight: 700; margin-bottom: 28px;
+}
+
+/* ── LANGUAGE GRID ── */
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.lang-card {
+  background: rgba(255,255,255,.03);
+  border: 2px solid rgba(74,144,255,.12);
+  border-radius: 16px;
+  padding: 18px 10px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+  overflow: hidden;
+}
+.lang-card:hover {
+  border-color: rgba(74,144,255,.5);
+  background: rgba(74,144,255,.07);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(74,144,255,.2);
+}
+.lang-card.selected {
+  border-color: var(--accent-color, #4ade80);
+  background: rgba(74,222,128,.08);
+  box-shadow: 0 0 0 1px var(--accent-color, #4ade80), 0 8px 24px rgba(74,222,128,.2);
+  transform: translateY(-4px) scale(1.03);
+}
+.lang-card.selected::after {
+  content: '✓';
+  position: absolute; top: 8px; right: 10px;
+  font-size: 12px; font-weight: 800;
+  color: var(--accent-color, #4ade80);
+}
+
+.lang-icon { font-size: 34px; margin-bottom: 8px; display: block; line-height: 1; }
+.lang-name {
+  font-size: 13px; font-weight: 800;
+  color: #8aabcc; letter-spacing: 0.3px;
+}
+.lang-tag {
+  font-size: 10px; font-weight: 700;
+  color: #3a5070; margin-top: 3px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* accents per language */
+.lang-card[data-lang="Python"]  { --accent-color:#4ade80; }
+.lang-card[data-lang="Java"]    { --accent-color:#fb923c; }
+.lang-card[data-lang="JavaScript"]{ --accent-color:#facc15; }
+.lang-card[data-lang="C++"]     { --accent-color:#60a5fa; }
+.lang-card[data-lang="Rust"]    { --accent-color:#f87171; }
+.lang-card[data-lang="Go"]      { --accent-color:#22d3ee; }
+.lang-card[data-lang="TypeScript"]{ --accent-color:#a78bfa; }
+.lang-card[data-lang="Swift"]   { --accent-color:#fb923c; }
+.lang-card[data-lang="Kotlin"]  { --accent-color:#e879f9; }
+
+.btn {
+  display: block; width: 100%; padding: 15px;
+  border-radius: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px; font-weight: 800;
+  cursor: pointer; border: none;
+  transition: transform .15s, box-shadow .15s, filter .15s, opacity .2s;
+}
+.btn:hover  { transform: translateY(-2px); }
+.btn:active { transform: scale(0.98); }
+.btn-primary {
+  background: linear-gradient(135deg,#4a90ff,#6a5aff);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(74,144,255,.35);
+}
+.btn-primary:hover { box-shadow:0 12px 32px rgba(74,144,255,.5); filter:brightness(1.08); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="moon"><div class="moon-c"></div></div>
+<div class="page-label">✦ CODEQUEST — CHOOSE YOUR PATH ✦</div>
+
+<div class="main-wrap">
+  <!-- Rabbit standing on the side -->
+  <div class="rabbit-side">
+    <div class="rabbit-bubble">Pick a language and I'll guide you! 🌟</div>
+    <svg class="rabbit-svg" viewBox="0 0 110 200" width="110" xmlns="http://www.w3.org/2000/svg">
+      <!-- ears -->
+      <ellipse cx="36" cy="38" rx="11" ry="30" fill="#c8d8f8"/>
+      <ellipse cx="36" cy="38" rx="6"  ry="24" fill="#f4b8cc"/>
+      <ellipse cx="74" cy="38" rx="11" ry="30" fill="#c8d8f8"/>
+      <ellipse cx="74" cy="38" rx="6"  ry="24" fill="#f4b8cc"/>
+      <!-- head -->
+      <ellipse cx="55" cy="78" rx="32" ry="30" fill="#ddeaff"/>
+      <!-- eyes -->
+      <circle cx="43" cy="72" r="7" fill="#fff"/>
+      <circle cx="67" cy="72" r="7" fill="#fff"/>
+      <circle cx="45" cy="71" r="4" fill="#1a2a4a"/>
+      <circle cx="69" cy="71" r="4" fill="#1a2a4a"/>
+      <circle cx="47" cy="69" r="1.5" fill="#fff"/>
+      <circle cx="71" cy="69" r="1.5" fill="#fff"/>
+      <!-- cheeks -->
+      <ellipse cx="35" cy="82" rx="8" ry="5" fill="#f9b8cc" opacity=".5"/>
+      <ellipse cx="75" cy="82" rx="8" ry="5" fill="#f9b8cc" opacity=".5"/>
+      <!-- nose & mouth -->
+      <ellipse cx="55" cy="84" rx="4" ry="3" fill="#f472b6"/>
+      <path d="M50 88 Q55 94 60 88" stroke="#d460a0" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <!-- body -->
+      <ellipse cx="55" cy="140" rx="28" ry="30" fill="#c8d8f8"/>
+      <!-- belly -->
+      <ellipse cx="55" cy="145" rx="16" ry="18" fill="#ddeaff" opacity=".7"/>
+      <!-- arms out to sides, holding -->
+      <ellipse cx="22" cy="130" rx="10" ry="18" fill="#c8d8f8" transform="rotate(-30 22 130)"/>
+      <ellipse cx="88" cy="130" rx="10" ry="18" fill="#c8d8f8" transform="rotate(30 88 130)"/>
+      <!-- legs -->
+      <ellipse cx="42" cy="170" rx="12" ry="10" fill="#c8d8f8"/>
+      <ellipse cx="68" cy="170" rx="12" ry="10" fill="#c8d8f8"/>
+      <!-- feet -->
+      <ellipse cx="38" cy="178" rx="14" ry="7" fill="#b8ccf0"/>
+      <ellipse cx="68" cy="178" rx="14" ry="7" fill="#b8ccf0"/>
+      <!-- star badge -->
+      <text x="46" y="148" font-size="12" fill="#7aabff" opacity=".8">★</text>
+    </svg>
+  </div>
+
+  <!-- Main card -->
+  <div class="card">
+    <div class="card-title">Choose Your Language</div>
+    <div class="card-sub">What do you want to learn first? You can always change later.</div>
+
+    <div class="lang-grid">
+      <div class="lang-card" data-lang="Python" onclick="selectLang(this)">
+        <span class="lang-icon">🐍</span>
+        <div class="lang-name">Python</div>
+        <div class="lang-tag">Beginner Friendly</div>
+      </div>
+      <div class="lang-card" data-lang="Java" onclick="selectLang(this)">
+        <span class="lang-icon">☕</span>
+        <div class="lang-name">Java</div>
+        <div class="lang-tag">Object Oriented</div>
+      </div>
+      <div class="lang-card" data-lang="JavaScript" onclick="selectLang(this)">
+        <span class="lang-icon">⚡</span>
+        <div class="lang-name">JavaScript</div>
+        <div class="lang-tag">Web Dev</div>
+      </div>
+      <div class="lang-card" data-lang="C++" onclick="selectLang(this)">
+        <span class="lang-icon">⚙️</span>
+        <div class="lang-name">C++</div>
+        <div class="lang-tag">Systems</div>
+      </div>
+      <div class="lang-card" data-lang="Rust" onclick="selectLang(this)">
+        <span class="lang-icon">🦀</span>
+        <div class="lang-name">Rust</div>
+        <div class="lang-tag">Fast & Safe</div>
+      </div>
+      <div class="lang-card" data-lang="Go" onclick="selectLang(this)">
+        <span class="lang-icon">🐹</span>
+        <div class="lang-name">Go</div>
+        <div class="lang-tag">Concurrent</div>
+      </div>
+      <div class="lang-card" data-lang="TypeScript" onclick="selectLang(this)">
+        <span class="lang-icon">🔷</span>
+        <div class="lang-name">TypeScript</div>
+        <div class="lang-tag">Typed JS</div>
+      </div>
+      <div class="lang-card" data-lang="Swift" onclick="selectLang(this)">
+        <span class="lang-icon">🍎</span>
+        <div class="lang-name">Swift</div>
+        <div class="lang-tag">iOS / macOS</div>
+      </div>
+      <div class="lang-card" data-lang="Kotlin" onclick="selectLang(this)">
+        <span class="lang-icon">🤖</span>
+        <div class="lang-name">Kotlin</div>
+        <div class="lang-tag">Android</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="continue-btn" disabled onclick="goHome()">
+      Continue →
+    </button>
+  </div>
+</div>
+
+<script>
+// Auth guard
+CQ.requireAuth();
+
+// Stars
+const s = document.getElementById('stars');
+for(let i=0;i<160;i++){
+  const el=document.createElement('div');el.className='star';
+  const sz=Math.random()*2.5+.5;
+  el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--delay:-${(Math.random()*6).toFixed(1)}s;`;
+  s.appendChild(el);
+}
+
+let selected = null;
+function selectLang(el) {
+  document.querySelectorAll('.lang-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = el.dataset.lang;
+  localStorage.setItem('cq_lang', selected);
+  document.getElementById('continue-btn').disabled = false;
+}
+const READY_LANGS = ['Python', 'Java'];
+
+async function goHome() {
+  if (!selected) return;
+  if (!READY_LANGS.includes(selected)) {
+    showComingSoon(selected);
+    return;
+  }
+  await CQ.saveLang(selected);
+  window.location.href = 'homepage.html';
+}
+
+function showComingSoon(lang) {
+  document.getElementById('cs-lang-name').textContent = lang;
+  document.getElementById('coming-soon-overlay').classList.add('show');
+}
+</script>
+
+<style>
+.cs-overlay{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;background:rgba(5,9,26,.9);backdrop-filter:blur(8px);}
+.cs-overlay.show{display:flex;}
+.cs-box{background:#0f1c38;border:1.5px solid rgba(130,170,255,.2);border-radius:24px;padding:44px 38px;width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.cs-icon{font-size:56px;margin-bottom:16px;}
+.cs-title{font-family:'Fredoka One',cursive;font-size:26px;color:#e8f2ff;margin-bottom:8px;}
+.cs-sub{font-size:14px;color:#5a7aaa;margin-bottom:24px;line-height:1.6;}
+.cs-badge{display:inline-block;padding:6px 16px;border-radius:99px;background:rgba(74,144,255,.1);border:1px solid rgba(74,144,255,.2);font-size:13px;font-weight:800;color:#60a5fa;margin-bottom:24px;}
+.cs-btn{display:block;width:100%;padding:14px;border-radius:13px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;background:linear-gradient(135deg,#4a90ff,#6a5aff);color:#fff;margin-bottom:10px;}
+.cs-btn-out{background:transparent;color:#5a7aaa;border:1.5px solid rgba(130,170,255,.2);border-radius:13px;padding:14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
+</style>
+<div class="cs-overlay" id="coming-soon-overlay">
+  <div class="cs-box">
+    <div class="cs-icon">🚀</div>
+    <div class="cs-title">Coming Soon!</div>
+    <div class="cs-badge" id="cs-lang-name">Language</div>
+    <div class="cs-sub">This language is not available yet.<br>We are working hard to bring it to you!<br><br>Currently available: <strong style="color:#e8f2ff;">Python</strong> and <strong style="color:#e8f2ff;">Java</strong></div>
+    <button class="cs-btn" onclick="document.getElementById('coming-soon-overlay').classList.remove('show')">← Choose Another Language</button>
+    <button class="cs-btn-out" onclick="window.location.href='homepage.html'">Continue with Python</button>
+  </div>
+</div>
+</body>
+</html>

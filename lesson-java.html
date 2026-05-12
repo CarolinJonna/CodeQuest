@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeQuest — Java Lesson 1: Hello World</title>
+<script src="cq.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#05091a;--card:#0f1c38;--border:rgba(130,170,255,.15);--text:#e8f2ff;--sub:#5a7aaa;--dim:#2a4060;--green:#4ade80;--yellow:#facc15;--blue:#60a5fa;--red:#f87171;--cyan:#22d3ee;--java:#fb923c;--code-bg:#070e20;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.sky{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,#1a0a00 0%,#05091a 60%);z-index:0;}
+.stars{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d) ease-in-out infinite var(--del);}
+@keyframes tw{0%,100%{opacity:.1;}50%{opacity:.8;}}
+.shell{position:relative;z-index:10;display:flex;flex-direction:column;min-height:100vh;}
+.topnav{display:flex;align-items:center;gap:14px;padding:13px 24px;background:#0a1428;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+.back-btn{display:flex;align-items:center;gap:7px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);color:var(--java);padding:8px 14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none;}
+.back-btn:hover{background:rgba(251,146,60,.2);}
+.lesson-title{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);}
+.nav-right{margin-left:auto;}
+.xp-badge{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:800;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);color:var(--green);}
+.chapter-nav{display:flex;align-items:center;padding:0 24px;background:#090f24;border-bottom:1px solid var(--border);overflow-x:auto;}
+.ch-tab{display:flex;align-items:center;gap:8px;padding:13px 18px;font-size:13px;font-weight:800;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;}
+.ch-tab:hover{color:var(--sub);}
+.ch-tab.active{color:var(--java);border-bottom-color:var(--java);}
+.ch-tab.done{color:var(--green);}
+.ch-tab.done .ch-num{background:var(--green);color:#fff;}
+.ch-tab.active .ch-num{background:var(--java);color:#fff;}
+.ch-num{width:22px;height:22px;border-radius:50%;background:var(--dim);color:var(--sub);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.content{flex:1;padding:26px 22px;max-width:1100px;margin:0 auto;width:100%;}
+.chapter-screen{display:none;animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;}
+.chapter-screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.video-card{background:var(--card);border:1.5px solid rgba(251,146,60,.2);border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.video-wrap{position:relative;width:100%;background:#000;aspect-ratio:16/9;}
+.video-wrap video{width:100%;height:100%;display:block;object-fit:cover;}
+.video-info{padding:22px 24px;}
+.video-info h3{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);margin-bottom:8px;}
+.video-info p{font-size:14px;color:var(--sub);line-height:1.65;margin-bottom:14px;}
+.video-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.topic-tag{padding:5px 12px;border-radius:99px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);font-size:12px;font-weight:800;color:var(--java);}
+.video-next-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;border:none;border-radius:12px;padding:13px 24px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(74,222,128,.35);transition:transform .15s;}
+.video-next-btn:hover{transform:translateY(-2px);}
+.coding-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+.question-panel{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px;}
+.chapter-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;margin-bottom:14px;font-size:11px;font-weight:900;letter-spacing:.5px;}
+.badge-practice{background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);color:var(--java);}
+.badge-debug{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red);}
+.q-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);margin-bottom:8px;}
+.q-desc{font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:16px;}
+.expected-box{background:var(--code-bg);border:1px solid rgba(251,146,60,.2);border-radius:12px;padding:13px 15px;margin-bottom:16px;}
+.expected-label{font-size:11px;font-weight:900;color:var(--java);letter-spacing:.6px;margin-bottom:7px;}
+.expected-code{font-family:'JetBrains Mono',monospace;font-size:13px;color:#fed7aa;line-height:1.6;}
+.hint-btn{display:flex;align-items:center;gap:6px;background:rgba(250,204,21,.06);border:1px solid rgba(250,204,21,.15);color:var(--yellow);padding:7px 13px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:14px;width:fit-content;}
+.hint-btn:hover{background:rgba(250,204,21,.12);}
+.hint-box{display:none;background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.15);border-radius:10px;padding:11px 13px;margin-bottom:14px;font-size:13px;color:#fde68a;line-height:1.7;}
+.hint-box.show{display:block;}
+.xp-reward{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.15);font-size:13px;font-weight:800;color:var(--green);}
+.editor-panel{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;}
+.editor-topbar{display:flex;align-items:center;gap:8px;padding:11px 15px;background:#09122a;border-bottom:1px solid var(--border);}
+.editor-dots{display:flex;gap:6px;}
+.dot{width:12px;height:12px;border-radius:50%;}
+.dot-r{background:#f87171;}.dot-y{background:#facc15;}.dot-g{background:#4ade80;}
+.editor-lang{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sub);}
+.editor-reset{margin-left:auto;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.15);color:var(--sub);padding:4px 10px;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;}
+.editor-reset:hover{background:rgba(251,146,60,.2);color:var(--text);}
+.code-area{width:100%;min-height:220px;resize:vertical;background:var(--code-bg);color:#c8d8ff;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;padding:15px;border:none;outline:none;tab-size:4;}
+.code-area::placeholder{color:var(--dim);}
+.output-area{min-height:65px;padding:11px 15px;background:#06101f;border-top:1px solid var(--border);}
+.output-label{font-size:10px;font-weight:900;color:var(--dim);letter-spacing:.8px;margin-bottom:5px;}
+.output-text{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;color:#fed7aa;}
+.output-text.error-out{color:var(--red);}
+.output-text.empty-out{color:var(--dim);font-style:italic;}
+.mismatch-note{display:none;margin-top:6px;font-size:12px;color:var(--yellow);font-weight:700;}
+.mismatch-note.show{display:block;}
+.action-row{display:flex;gap:10px;padding:13px 15px;background:#09122a;border-top:1px solid var(--border);}
+.btn-run{flex:1;padding:12px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;background:rgba(251,146,60,.12);border:1.5px solid rgba(251,146,60,.3);color:var(--java);transition:all .2s;}
+.btn-run:hover{background:rgba(251,146,60,.22);transform:translateY(-1px);}
+.btn-submit{flex:1;padding:12px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;box-shadow:0 6px 16px rgba(74,222,128,.28);transition:all .2s;}
+.btn-submit:hover{transform:translateY(-2px);}
+.btn-submit:disabled{background:var(--dim);color:#1a2a3a;box-shadow:none;cursor:not-allowed;transform:none!important;opacity:.5;}
+.bottom-bar{padding:14px 24px;background:#0a1428;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;position:sticky;bottom:0;z-index:40;}
+.progress-track{flex:1;height:7px;background:var(--dim);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--java),var(--yellow));transition:width .6s cubic-bezier(.22,1,.36,1);}
+.progress-label{font-size:12px;font-weight:800;color:var(--sub);white-space:nowrap;}
+.overlay{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;background:rgba(5,9,26,.88);backdrop-filter:blur(8px);}
+.overlay.show{display:flex;}
+.overlay-box{border-radius:28px;padding:44px 38px;width:420px;text-align:center;position:relative;animation:boxIn .45s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes boxIn{from{transform:scale(.78);}to{transform:scale(1);}}
+.success-box{background:#0c1a30;border:1.5px solid rgba(74,222,128,.3);box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.success-box::before{content:'';position:absolute;top:-1px;left:50px;right:50px;height:1px;background:linear-gradient(90deg,transparent,rgba(74,222,128,.6),transparent);}
+.congrats-box{background:#0c1a30;border:1.5px solid rgba(251,146,60,.3);box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.congrats-box::before{content:'';position:absolute;top:-1px;left:40px;right:40px;height:1px;background:linear-gradient(90deg,transparent,rgba(251,146,60,.6),transparent);}
+.ov-icon{font-size:58px;margin-bottom:14px;display:block;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1) both .1s;}
+@keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
+.ov-title{font-family:'Fredoka One',cursive;font-size:24px;color:var(--text);margin-bottom:6px;}
+.ov-sub{font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.5;}
+.ov-xp{border-radius:12px;padding:11px;margin-bottom:22px;font-family:'Fredoka One',cursive;font-size:20px;}
+.ov-xp.green{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);color:var(--green);}
+.ov-xp.orange{background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);color:var(--java);}
+.confetti-row{font-size:22px;letter-spacing:7px;margin-bottom:18px;}
+.congrats-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.cs-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;}
+.cs-val{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);}
+.cs-lbl{font-size:10px;font-weight:800;color:var(--sub);letter-spacing:.4px;margin-top:3px;}
+.ov-btn{display:block;width:100%;padding:14px;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:transform .15s;margin-bottom:10px;}
+.ov-btn:last-child{margin-bottom:0;}
+.btn-primary-ov{background:linear-gradient(135deg,#4a90ff,#6a5aff);color:#fff;}
+.btn-primary-ov:hover{transform:translateY(-2px);}
+.btn-green-ov{background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;}
+.btn-green-ov:hover{transform:translateY(-2px);}
+@media(max-width:768px){.coding-wrap{grid-template-columns:1fr;}.content{padding:14px;}}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="shell">
+
+<nav class="topnav">
+  <a class="back-btn" href="homepage.html">← Home</a>
+  <span class="lesson-title">☕ Java Lesson 1 — Hello World</span>
+  <div class="nav-right">
+    <div class="xp-badge">⭐ <span id="earned-xp">0</span> XP earned</div>
+  </div>
+</nav>
+
+<div class="chapter-nav">
+  <div class="ch-tab active" id="tab-1" onclick="goChapter(1)"><div class="ch-num">1</div> Intro Video</div>
+  <div class="ch-tab" id="tab-2" onclick="goChapter(2)"><div class="ch-num">2</div> Hello World</div>
+  <div class="ch-tab" id="tab-3" onclick="goChapter(3)"><div class="ch-num">3</div> Variables</div>
+  <div class="ch-tab" id="tab-4" onclick="goChapter(4)"><div class="ch-num">4</div> Fix the Bug</div>
+  <div class="ch-tab" id="tab-5" onclick="goChapter(5)"><div class="ch-num">5</div> Mini Challenge</div>
+</div>
+
+<div class="content">
+
+  <!-- CH1 VIDEO -->
+  <div class="chapter-screen active" id="ch-1">
+    <div class="video-card">
+      <div class="video-wrap">
+        <video id="lesson-video" controls controlsList="nodownload" oncontextmenu="return false">
+          <source src="lesson1-java-intro.mp4" type="video/mp4">
+          Your browser does not support video.
+        </video>
+      </div>
+      <div class="video-info">
+        <h3>☕ Java Introduction</h3>
+        <p>Learn what Java is, how a Java program is structured with classes and the main method, and how to use <code style="background:rgba(251,146,60,.1);color:var(--java);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">System.out.println()</code> to display output.</p>
+        <div class="video-topics">
+          <span class="topic-tag">What is Java?</span>
+          <span class="topic-tag">Classes & Methods</span>
+          <span class="topic-tag">System.out.println()</span>
+          <span class="topic-tag">Semicolons</span>
+          <span class="topic-tag">Compiling Java</span>
+        </div>
+        <button class="video-next-btn" onclick="completeChapter(1)">Start Practice →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH2 HELLO WORLD -->
+  <div class="chapter-screen" id="ch-2">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">📝 JAVA PRACTICE</div>
+        <div class="q-title">Write Hello World in Java</div>
+        <div class="q-desc">
+          In Java every program needs a <strong style="color:var(--text);">class</strong> and a <strong style="color:var(--text);">main method</strong>. Output is printed using <code style="background:rgba(251,146,60,.1);color:var(--java);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">System.out.println()</code>.<br><br>
+          Every statement must end with a <strong style="color:var(--text);">semicolon ;</strong>
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">Hello, World!</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-2')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-2">
+          Inside the main method write:<br>
+          <code style="font-family:'JetBrains Mono',monospace;">System.out.println("Hello, World!");</code>
+        </div>
+        <div class="xp-reward">⭐ +40 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">java · Main.java</div>
+          <button class="editor-reset" onclick="resetCode(2)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-2" spellcheck="false">public class Main {
+    public static void main(String[] args) {
+        // Write your Java code here
+
+    }
+}</textarea>
+        <div class="output-area"><div class="output-label">OUTPUT</div><div class="output-text empty-out" id="output-2">Click Run to see output...</div><div class="mismatch-note" id="mismatch-2">⚠️ Output must be exactly: Hello, World!</div></div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(2)">▶ Run</button>
+          <button class="btn-submit" id="submit-2" onclick="submitCode(2)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH3 VARIABLES -->
+  <div class="chapter-screen" id="ch-3">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">📝 JAVA PRACTICE</div>
+        <div class="q-title">Declare and Print Variables</div>
+        <div class="q-desc">
+          In Java, variables must be declared with their <strong style="color:var(--text);">data type</strong>.<br>
+          Use <code style="background:rgba(251,146,60,.1);color:var(--java);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">String</code> for text and <code style="background:rgba(251,146,60,.1);color:var(--java);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">int</code> for numbers.<br><br>
+          Use <code style="background:rgba(251,146,60,.1);color:var(--java);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">+</code> to join text and variables together.
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">Name: Java Coder<br>Age: 20</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-3')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-3">
+          <code style="font-family:'JetBrains Mono',monospace;">String name = "Java Coder";<br>int age = 20;<br>System.out.println("Name: " + name);<br>System.out.println("Age: " + age);</code>
+        </div>
+        <div class="xp-reward">⭐ +50 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">java · Main.java</div>
+          <button class="editor-reset" onclick="resetCode(3)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-3" spellcheck="false">public class Main {
+    public static void main(String[] args) {
+        // Declare variables and print them
+
+    }
+}</textarea>
+        <div class="output-area"><div class="output-label">OUTPUT</div><div class="output-text empty-out" id="output-3">Click Run to see output...</div><div class="mismatch-note" id="mismatch-3">⚠️ Must show Name: and Age: on two lines.</div></div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(3)">▶ Run</button>
+          <button class="btn-submit" id="submit-3" onclick="submitCode(3)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH4 FIX THE BUG -->
+  <div class="chapter-screen" id="ch-4">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-debug">🐛 ERROR CORRECTION</div>
+        <div class="q-title">Fix the Java Bugs!</div>
+        <div class="q-desc">
+          The Java code below has <strong style="color:var(--red);">3 errors</strong>. Find and fix all of them so it runs and prints the correct output.<br><br>
+          Submit only unlocks when output matches exactly.
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">Hello Java!<br>I am learning Java</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-4')">💡 Show Hints</button>
+        <div class="hint-box" id="hint-4">
+          1. <code style="font-family:'JetBrains Mono',monospace;">system.out</code> → capital S: <code style="font-family:'JetBrains Mono',monospace;">System.out</code><br>
+          2. Missing semicolon <code style="font-family:'JetBrains Mono',monospace;">;</code> after first println<br>
+          3. <code style="font-family:'JetBrains Mono',monospace;">printLn</code> → lowercase n: <code style="font-family:'JetBrains Mono',monospace;">println</code>
+        </div>
+        <div class="xp-reward">⭐ +60 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">java · Main.java (buggy)</div>
+          <button class="editor-reset" onclick="resetCode(4)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-4" spellcheck="false">public class Main {
+    public static void main(String[] args) {
+        system.out.println("Hello Java!")
+        System.out.printLn("I am learning Java");
+    }
+}</textarea>
+        <div class="output-area"><div class="output-label">OUTPUT</div><div class="output-text empty-out" id="output-4">Click Run to see output...</div><div class="mismatch-note" id="mismatch-4">⚠️ Fix all errors so output matches exactly.</div></div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(4)">▶ Run</button>
+          <button class="btn-submit" id="submit-4" onclick="submitCode(4)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH5 MINI CHALLENGE -->
+  <div class="chapter-screen" id="ch-5">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">🏆 MINI CHALLENGE</div>
+        <div class="q-title">Java Info Card</div>
+        <div class="q-desc">
+          Write a complete Java program that prints exactly 3 lines: your name, your age, and Java as your language.<br><br>
+          Submit only unlocks when all 3 lines match the format!
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT FORMAT</div>
+          <div class="expected-code">Name: [Your Name]<br>Age: [Your Age]<br>Language: Java</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-5')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-5">
+          <code style="font-family:'JetBrains Mono',monospace;">System.out.println("Name: Ravi");<br>System.out.println("Age: 20");<br>System.out.println("Language: Java");</code>
+        </div>
+        <div class="xp-reward">⭐ +70 XP — Lesson Complete!</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">java · Main.java</div>
+          <button class="editor-reset" onclick="resetCode(5)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-5" spellcheck="false">public class Main {
+    public static void main(String[] args) {
+        // Print your info card here
+
+    }
+}</textarea>
+        <div class="output-area"><div class="output-label">OUTPUT</div><div class="output-text empty-out" id="output-5">Click Run to see output...</div><div class="mismatch-note" id="mismatch-5">⚠️ Must have Name:, Age:, and Language: Java on 3 lines.</div></div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(5)">▶ Run</button>
+          <button class="btn-submit" id="submit-5" onclick="submitCode(5)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="progress-label">Chapter <span id="ch-current">1</span> of 5</div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+  <div class="progress-label" id="progress-pct">20%</div>
+</div>
+</div>
+
+<!-- SUCCESS -->
+<div class="overlay" id="ov-success">
+  <div class="overlay-box success-box">
+    <span class="ov-icon">🎉</span>
+    <div class="ov-title" id="s-title">Chapter Complete!</div>
+    <div class="ov-sub" id="s-sub">Well done!</div>
+    <div class="ov-xp green" id="s-xp">+40 XP</div>
+    <button class="ov-btn btn-primary-ov" onclick="nextChapter()">Next Chapter →</button>
+  </div>
+</div>
+
+<!-- CONGRATULATIONS -->
+<div class="overlay" id="ov-congrats">
+  <div class="overlay-box congrats-box">
+    <span class="ov-icon">🏆</span>
+    <div class="ov-title">Congratulations!</div>
+    <div class="confetti-row">🎊☕✨🎉✨☕🎊</div>
+    <div class="ov-sub">You completed Java Lesson 1 — Hello World! Excellent work!</div>
+    <div class="congrats-stats">
+      <div class="cs-card"><div class="cs-val" id="cg-xp">0</div><div class="cs-lbl">XP EARNED</div></div>
+      <div class="cs-card"><div class="cs-val">5</div><div class="cs-lbl">CHAPTERS DONE</div></div>
+    </div>
+    <div class="ov-xp orange">🔥 Streak updated! Java Lesson 1 complete!</div>
+    <button class="ov-btn btn-green-ov" onclick="goHome()">Go to Home 🏠</button>
+  </div>
+</div>
+
+<script>
+// CQ loaded from cq.js
+CQ.requireAuth();
+
+
+const se=document.getElementById('stars');
+for(let i=0;i<120;i++){const el=document.createElement('div');el.className='star';const sz=Math.random()*2+.5;el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--del:-${(Math.random()*6).toFixed(1)}s;`;se.appendChild(el);}
+
+let currentChapter=1, completedChapters=new Set(), earnedXP=0, canSubmit={};
+const XP={1:30,2:40,3:50,4:60,5:70};
+const DEFAULTS={
+  2:`public class Main {\n    public static void main(String[] args) {\n        // Write your Java code here\n\n    }\n}`,
+  3:`public class Main {\n    public static void main(String[] args) {\n        // Declare variables and print them\n\n    }\n}`,
+  4:`public class Main {\n    public static void main(String[] args) {\n        system.out.println("Hello Java!")\n        System.out.printLn("I am learning Java");\n    }\n}`,
+  5:`public class Main {\n    public static void main(String[] args) {\n        // Print your info card here\n\n    }\n}`
+};
+
+// Java simulator
+function simulateJava(code){
+  const output=[], errors=[];
+  if(!code.includes('public class')){errors.push('Error: Missing class declaration — Java needs: public class Main { ... }');return{output,errors};}
+  if(!code.includes('public static void main')){errors.push('Error: Missing main method — Java needs: public static void main(String[] args) { ... }');return{output,errors};}
+  if(/system\.out/i.test(code) && !/System\.out/.test(code)){errors.push('Error: Java is case-sensitive. Use System.out not system.out');return{output,errors};}
+  if(/\.printLn\s*\(/.test(code)){errors.push('Error: Method not found — use println() not printLn() (Java is case-sensitive)');return{output,errors};}
+  const lines=code.split('\n');
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();
+    if(/System\.out\.println\s*\(.*\)/.test(line) && !line.endsWith(';')){
+      errors.push(`Line ${i+1}: SyntaxError — Missing semicolon ; at end of statement`);
+      return{output,errors};
+    }
+  }
+  const regex=/System\.out\.println\s*\(\s*(.*?)\s*\)\s*;/g;
+  let match;
+  while((match=regex.exec(code))!==null){
+    let val=match[1].trim();
+    const dq=val.match(/^"(.*)"$/); if(dq){output.push(dq[1]);continue;}
+    const sq=val.match(/^'(.*)'$/); if(sq){output.push(sq[1]);continue;}
+    if(val.includes('+')){
+      let parts=val.split('+').map(p=>p.trim());
+      let result='';
+      for(let p of parts){
+        const dqp=p.match(/^"(.*)"$/); if(dqp){result+=dqp[1];continue;}
+        if(/^\d+$/.test(p)){result+=p;continue;}
+        result+=`[${p}]`;
+      }
+      output.push(result);continue;
+    }
+    if(/^\d+$/.test(val)){output.push(val);continue;}
+    output.push(val);
+  }
+  return{output,errors};
+}
+
+// Validators — Java content only
+const VALIDATORS={
+  2:(out)=>out.length>0 && out[0].trim()==='Hello, World!',
+  3:(out)=>out.length>=2 && out[0].toLowerCase().startsWith('name:') && out[1].toLowerCase().startsWith('age:'),
+  4:(out)=>out.length>=2 && out[0].trim()==='Hello Java!' && out[1].trim()==='I am learning Java',
+  5:(out)=>out.length>=3 && out[0].toLowerCase().startsWith('name:') && out[1].toLowerCase().startsWith('age:') && out[2].toLowerCase().includes('language:') && out[2].toLowerCase().includes('java')
+};
+
+function goChapter(n){
+  const max=completedChapters.size+1; if(n>max)return;
+  currentChapter=n;
+  document.querySelectorAll('.chapter-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ch-'+n).classList.add('active');
+  document.querySelectorAll('.ch-tab').forEach((t,i)=>{t.classList.remove('active');if(completedChapters.has(i+1))t.classList.add('done');else t.classList.remove('done');});
+  document.getElementById('tab-'+n).classList.add('active');
+  const pct=Math.round((n/5)*100);
+  document.getElementById('ch-current').textContent=n;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+}
+
+function completeChapter(n){showChapterSuccess(n);}
+
+function runCode(ch){
+  const code=document.getElementById('code-'+ch).value;
+  const result=simulateJava(code);
+  const outEl=document.getElementById('output-'+ch);
+  const submitBtn=document.getElementById('submit-'+ch);
+  const mismatch=document.getElementById('mismatch-'+ch);
+  mismatch.classList.remove('show');
+  outEl.style.borderLeft='none';
+  if(result.errors.length>0){
+    outEl.className='output-text error-out';
+    outEl.innerHTML=result.errors.join('<br>');
+    submitBtn.disabled=true; canSubmit[ch]=false;
+  } else if(result.output.length>0){
+    outEl.className='output-text';
+    outEl.innerHTML=result.output.join('<br>');
+    const valid=VALIDATORS[ch]?VALIDATORS[ch](result.output):true;
+    if(valid){canSubmit[ch]=true;submitBtn.disabled=false;outEl.style.borderLeft='3px solid var(--green)';}
+    else{canSubmit[ch]=false;submitBtn.disabled=true;mismatch.classList.add('show');}
+  } else {
+    outEl.className='output-text empty-out';
+    outEl.textContent='(no output — use System.out.println())';
+    submitBtn.disabled=true; canSubmit[ch]=false;
+  }
+}
+
+function submitCode(ch){if(!canSubmit[ch])return;showChapterSuccess(ch);}
+
+async function showChapterSuccess(ch){
+  completedChapters.add(ch);
+  const xp=XP[ch]||40;earnedXP+=xp;
+  document.getElementById('earned-xp').textContent=earnedXP;
+  document.getElementById('tab-'+ch).classList.add('done');
+  if(ch<5) CQ.completeChapter('java1', ch, xp);
+  if(ch===5){showCongrats();return;}
+  document.getElementById('s-title').textContent=`Chapter ${ch} Complete!`;
+  document.getElementById('s-sub').textContent=`Well done! ${5-ch} chapter${5-ch!==1?'s':''} to go.`;
+  document.getElementById('s-xp').textContent=`+${xp} XP`;
+  document.getElementById('ov-success').classList.add('show');
+}
+
+async function showCongrats(){
+  await CQ.completeChapter('java1', 5, XP[5]);
+  document.getElementById('cg-xp').textContent=earnedXP;
+  document.getElementById('ov-congrats').classList.add('show');
+}
+
+function goHome(){document.getElementById('ov-congrats').classList.remove('show');window.location.href='homepage.html';}
+function nextChapter(){document.getElementById('ov-success').classList.remove('show');goChapter(currentChapter+1);}
+function toggleHint(id){document.getElementById(id).classList.toggle('show');}
+function resetCode(ch){
+  document.getElementById('code-'+ch).value=DEFAULTS[ch]||'';
+  const outEl=document.getElementById('output-'+ch);
+  outEl.className='output-text empty-out';outEl.textContent='Click Run to see output...';outEl.style.borderLeft='none';
+  document.getElementById('submit-'+ch).disabled=true;
+  document.getElementById('mismatch-'+ch).classList.remove('show');
+  canSubmit[ch]=false;
+}
+document.querySelectorAll('.code-area').forEach(ta=>{
+  ta.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const s=ta.selectionStart;ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+4;}});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeQuest — Lesson 1: Hello World</title>
+<script src="cq.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#05091a;--card:#0f1c38;--border:rgba(130,170,255,.15);--text:#e8f2ff;--sub:#5a7aaa;--dim:#2a4060;--green:#4ade80;--yellow:#facc15;--blue:#60a5fa;--red:#f87171;--cyan:#22d3ee;--code-bg:#070e20;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.sky{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,#0d1b4b 0%,#05091a 60%);z-index:0;}
+.stars{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d) ease-in-out infinite var(--del);}
+@keyframes tw{0%,100%{opacity:.1;}50%{opacity:.8;}}
+.shell{position:relative;z-index:10;display:flex;flex-direction:column;min-height:100vh;}
+
+/* NAV */
+.topnav{display:flex;align-items:center;gap:14px;padding:13px 24px;background:#0a1428;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+.back-btn{display:flex;align-items:center;gap:7px;background:rgba(74,144,255,.1);border:1px solid rgba(74,144,255,.2);color:var(--blue);padding:8px 14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none;}
+.back-btn:hover{background:rgba(74,144,255,.2);}
+.lesson-title{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);}
+.nav-right{margin-left:auto;}
+.xp-badge{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:800;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);color:var(--green);}
+
+/* CHAPTER TABS */
+.chapter-nav{display:flex;align-items:center;padding:0 24px;background:#090f24;border-bottom:1px solid var(--border);overflow-x:auto;}
+.ch-tab{display:flex;align-items:center;gap:8px;padding:13px 18px;font-size:13px;font-weight:800;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;}
+.ch-tab:hover{color:var(--sub);}
+.ch-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.ch-tab.done{color:var(--green);}
+.ch-tab.done .ch-num{background:var(--green);color:#fff;}
+.ch-tab.active .ch-num{background:var(--blue);color:#fff;}
+.ch-num{width:22px;height:22px;border-radius:50%;background:var(--dim);color:var(--sub);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+
+/* CONTENT */
+.content{flex:1;padding:26px 22px;max-width:1100px;margin:0 auto;width:100%;}
+.chapter-screen{display:none;animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;}
+.chapter-screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* VIDEO CARD */
+.video-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.video-wrap{position:relative;width:100%;background:#000;aspect-ratio:16/9;}
+.video-wrap video{width:100%;height:100%;display:block;object-fit:cover;}
+
+.video-info{padding:22px 24px;}
+.video-info h3{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);margin-bottom:8px;}
+.video-info p{font-size:14px;color:var(--sub);line-height:1.65;margin-bottom:14px;}
+.video-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.topic-tag{padding:5px 12px;border-radius:99px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);font-size:12px;font-weight:800;color:var(--blue);}
+.video-next-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:12px;padding:13px 24px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;box-shadow:0 8px 20px rgba(74,222,128,.35);transition:transform .15s;}
+.video-next-btn:hover{transform:translateY(-2px);}
+
+/* CODING */
+.coding-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+.question-panel{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px;}
+.chapter-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;margin-bottom:14px;font-size:11px;font-weight:900;letter-spacing:.5px;}
+.badge-practice{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);color:var(--blue);}
+.badge-debug{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red);}
+.q-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);margin-bottom:8px;}
+.q-desc{font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:16px;}
+.expected-box{background:var(--code-bg);border:1px solid rgba(74,222,128,.2);border-radius:12px;padding:13px 15px;margin-bottom:16px;}
+.expected-label{font-size:11px;font-weight:900;color:var(--green);letter-spacing:.6px;margin-bottom:7px;}
+.expected-code{font-family:'JetBrains Mono',monospace;font-size:13px;color:#a8e6b8;line-height:1.6;}
+.hint-btn{display:flex;align-items:center;gap:6px;background:rgba(250,204,21,.06);border:1px solid rgba(250,204,21,.15);color:var(--yellow);padding:7px 13px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:14px;transition:background .2s;width:fit-content;}
+.hint-btn:hover{background:rgba(250,204,21,.12);}
+.hint-box{display:none;background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.15);border-radius:10px;padding:11px 13px;margin-bottom:14px;font-size:13px;color:#fde68a;line-height:1.7;}
+.hint-box.show{display:block;}
+.xp-reward{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.15);font-size:13px;font-weight:800;color:var(--green);}
+
+/* EDITOR */
+.editor-panel{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;}
+.editor-topbar{display:flex;align-items:center;gap:8px;padding:11px 15px;background:#09122a;border-bottom:1px solid var(--border);}
+.editor-dots{display:flex;gap:6px;}
+.dot{width:12px;height:12px;border-radius:50%;}
+.dot-r{background:#f87171;}.dot-y{background:#facc15;}.dot-g{background:#4ade80;}
+.editor-lang{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sub);}
+.editor-reset{margin-left:auto;background:rgba(74,144,255,.08);border:1px solid rgba(74,144,255,.15);color:var(--sub);padding:4px 10px;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;}
+.editor-reset:hover{background:rgba(74,144,255,.2);color:var(--text);}
+.code-area{width:100%;min-height:200px;resize:vertical;background:var(--code-bg);color:#c8d8ff;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;padding:15px;border:none;outline:none;tab-size:4;}
+.code-area::placeholder{color:var(--dim);}
+.output-area{min-height:65px;padding:11px 15px;background:#06101f;border-top:1px solid var(--border);}
+.output-label{font-size:10px;font-weight:900;color:var(--dim);letter-spacing:.8px;margin-bottom:5px;}
+.output-text{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;color:#a8e6b8;}
+.output-text.error-out{color:var(--red);}
+.output-text.empty-out{color:var(--dim);font-style:italic;}
+.mismatch-note{display:none;margin-top:6px;font-size:12px;color:var(--yellow);font-weight:700;}
+.mismatch-note.show{display:block;}
+
+.action-row{display:flex;gap:10px;padding:13px 15px;background:#09122a;border-top:1px solid var(--border);}
+.btn-run{flex:1;padding:12px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;background:rgba(96,165,250,.12);border:1.5px solid rgba(96,165,250,.3);color:var(--blue);transition:all .2s;}
+.btn-run:hover{background:rgba(96,165,250,.22);transform:translateY(-1px);}
+.btn-submit{flex:1;padding:12px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;box-shadow:0 6px 16px rgba(74,222,128,.28);transition:all .2s;}
+.btn-submit:hover{transform:translateY(-2px);}
+.btn-submit:disabled{background:var(--dim);color:#1a2a3a;box-shadow:none;cursor:not-allowed;transform:none!important;opacity:.5;}
+
+/* BOTTOM BAR */
+.bottom-bar{padding:14px 24px;background:#0a1428;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;position:sticky;bottom:0;z-index:40;}
+.progress-track{flex:1;height:7px;background:var(--dim);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .6s cubic-bezier(.22,1,.36,1);}
+.progress-label{font-size:12px;font-weight:800;color:var(--sub);white-space:nowrap;}
+
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;background:rgba(5,9,26,.88);backdrop-filter:blur(8px);}
+.overlay.show{display:flex;}
+.overlay-box{border-radius:28px;padding:44px 38px;width:420px;text-align:center;position:relative;animation:boxIn .45s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes boxIn{from{transform:scale(.78);}to{transform:scale(1);}}
+.success-box{background:#0c1a30;border:1.5px solid rgba(74,222,128,.3);box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.success-box::before{content:'';position:absolute;top:-1px;left:50px;right:50px;height:1px;background:linear-gradient(90deg,transparent,rgba(74,222,128,.6),transparent);}
+.congrats-box{background:#0c1a30;border:1.5px solid rgba(250,204,21,.3);box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.congrats-box::before{content:'';position:absolute;top:-1px;left:40px;right:40px;height:1px;background:linear-gradient(90deg,transparent,rgba(250,204,21,.6),transparent);}
+.ov-icon{font-size:58px;margin-bottom:14px;display:block;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1) both .1s;}
+@keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
+.ov-title{font-family:'Fredoka One',cursive;font-size:24px;color:var(--text);margin-bottom:6px;}
+.ov-sub{font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.5;}
+.ov-xp{border-radius:12px;padding:11px;margin-bottom:22px;font-family:'Fredoka One',cursive;font-size:20px;}
+.ov-xp.green{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);color:var(--green);}
+.ov-xp.yellow{background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.2);color:var(--yellow);}
+.confetti-row{font-size:22px;letter-spacing:7px;margin-bottom:18px;}
+.congrats-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.cs-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;}
+.cs-val{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);}
+.cs-lbl{font-size:10px;font-weight:800;color:var(--sub);letter-spacing:.4px;margin-top:3px;}
+.ov-btn{display:block;width:100%;padding:14px;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:transform .15s;margin-bottom:10px;}
+.ov-btn:last-child{margin-bottom:0;}
+.btn-primary-ov{background:linear-gradient(135deg,#4a90ff,#6a5aff);color:#fff;box-shadow:0 8px 24px rgba(74,144,255,.35);}
+.btn-primary-ov:hover{transform:translateY(-2px);}
+.btn-green-ov{background:linear-gradient(135deg,#4ade80,#22c55e);color:#052010;box-shadow:0 8px 20px rgba(74,222,128,.3);}
+.btn-green-ov:hover{transform:translateY(-2px);}
+
+@media(max-width:768px){.coding-wrap{grid-template-columns:1fr;}.content{padding:14px;}}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="shell">
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="back-btn" href="homepage.html">← Home</a>
+  <span class="lesson-title">🐍 Lesson 1 — Hello World</span>
+  <div class="nav-right">
+    <div class="xp-badge">⭐ <span id="earned-xp">0</span> XP earned</div>
+  </div>
+</nav>
+
+<!-- CHAPTER TABS -->
+<div class="chapter-nav">
+  <div class="ch-tab active" id="tab-1" onclick="goChapter(1)"><div class="ch-num">1</div> Intro Video</div>
+  <div class="ch-tab" id="tab-2" onclick="goChapter(2)"><div class="ch-num">2</div> Print Your Name</div>
+  <div class="ch-tab" id="tab-3" onclick="goChapter(3)"><div class="ch-num">3</div> Print Numbers</div>
+  <div class="ch-tab" id="tab-4" onclick="goChapter(4)"><div class="ch-num">4</div> Fix the Bug</div>
+  <div class="ch-tab" id="tab-5" onclick="goChapter(5)"><div class="ch-num">5</div> Mini Challenge</div>
+</div>
+
+<div class="content">
+
+  <!-- ═══════════════════════════
+       CHAPTER 1 — LOCAL VIDEO
+  ═══════════════════════════ -->
+  <div class="chapter-screen active" id="ch-1">
+    <div class="video-card">
+
+      <!-- VIDEO PLAYER -->
+      <div class="video-wrap">
+        <video id="lesson-video" controls controlsList="nodownload" oncontextmenu="return false">
+          <source src="lesson1-intro.mp4" type="video/mp4">
+          Your browser does not support video.
+        </video>
+      </div>
+
+      <div class="video-info">
+        <h3>📺 Hello World — Introduction</h3>
+        <p>Learn what Python is, how programs work, and how to use the
+          <code style="background:rgba(96,165,250,.1);color:var(--blue);padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;">print()</code>
+          function to display text on screen.
+        </p>
+        <div class="video-topics">
+          <span class="topic-tag">What is Python?</span>
+          <span class="topic-tag">print() function</span>
+          <span class="topic-tag">Strings</span>
+          <span class="topic-tag">Running code</span>
+        </div>
+        <button class="video-next-btn" id="video-next-btn" onclick="completeChapter(1)">
+          Start Practice →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       CHAPTER 2 — PRINT YOUR NAME
+  ═══════════════════════════ -->
+  <div class="chapter-screen" id="ch-2">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">📝 CODING PRACTICE</div>
+        <div class="q-title">Print Your Name</div>
+        <div class="q-desc">
+          Use the <code style="background:rgba(96,165,250,.1);color:var(--blue);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;">print()</code>
+          function to display your name on screen.<br><br>
+          Text must be typed <strong style="color:var(--text);">inside quotes</strong> inside the brackets.<br>
+          The Submit button only unlocks when your output matches the expected result exactly.
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">Hello, my name is [Your Name]</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-2')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-2">
+          Try: <code style="font-family:'JetBrains Mono',monospace;">print("Hello, my name is Ravi")</code><br>
+          Replace Ravi with your own name!
+        </div>
+        <div class="xp-reward">⭐ +40 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">python · ch2.py</div>
+          <button class="editor-reset" onclick="resetCode(2)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-2" spellcheck="false"># Write your code here
+print()</textarea>
+        <div class="output-area">
+          <div class="output-label">OUTPUT</div>
+          <div class="output-text empty-out" id="output-2">Click Run to see output...</div>
+          <div class="mismatch-note" id="mismatch-2">⚠️ Output must start with "Hello, my name is" — fix and run again.</div>
+        </div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(2)">▶ Run</button>
+          <button class="btn-submit" id="submit-2" onclick="submitCode(2)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       CHAPTER 3 — PRINT NUMBERS
+  ═══════════════════════════ -->
+  <div class="chapter-screen" id="ch-3">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">📝 CODING PRACTICE</div>
+        <div class="q-title">Print Numbers 1 to 5</div>
+        <div class="q-desc">
+          Use <code style="background:rgba(96,165,250,.1);color:var(--blue);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;">print()</code>
+          five times to display the numbers 1, 2, 3, 4 and 5 — each on a new line.<br><br>
+          Numbers do <strong style="color:var(--text);">not</strong> need quotes inside print().
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">1<br>2<br>3<br>4<br>5</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-3')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-3">
+          Write five separate print statements:<br>
+          <code style="font-family:'JetBrains Mono',monospace;">print(1)<br>print(2)<br>print(3)<br>print(4)<br>print(5)</code>
+        </div>
+        <div class="xp-reward">⭐ +50 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">python · ch3.py</div>
+          <button class="editor-reset" onclick="resetCode(3)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-3" spellcheck="false"># Print the numbers 1 to 5
+</textarea>
+        <div class="output-area">
+          <div class="output-label">OUTPUT</div>
+          <div class="output-text empty-out" id="output-3">Click Run to see output...</div>
+          <div class="mismatch-note" id="mismatch-3">⚠️ Output must be exactly 1, 2, 3, 4, 5 on separate lines.</div>
+        </div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(3)">▶ Run</button>
+          <button class="btn-submit" id="submit-3" onclick="submitCode(3)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       CHAPTER 4 — FIX THE BUG
+  ═══════════════════════════ -->
+  <div class="chapter-screen" id="ch-4">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-debug">🐛 ERROR CORRECTION</div>
+        <div class="q-title">Fix the Broken Code!</div>
+        <div class="q-desc">
+          The code below has <strong style="color:var(--red);">3 errors</strong>. Find and fix them all so the program runs correctly.<br><br>
+          Submit only unlocks when your output exactly matches the expected result.
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT</div>
+          <div class="expected-code">Hello World<br>I love Python!</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-4')">💡 Show Hints</button>
+        <div class="hint-box" id="hint-4">
+          1. <code style="font-family:'JetBrains Mono',monospace;">Print</code> → must be lowercase <code style="font-family:'JetBrains Mono',monospace;">print</code><br>
+          2. <code style="font-family:'JetBrains Mono',monospace;">print("I love Python!</code> → missing closing quote <code style="font-family:'JetBrains Mono',monospace;">"</code><br>
+          3. <code style="font-family:'JetBrains Mono',monospace;">print "Goodbye"</code> → remove this line entirely
+        </div>
+        <div class="xp-reward">⭐ +60 XP on completion</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">python · ch4_buggy.py</div>
+          <button class="editor-reset" onclick="resetCode(4)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-4" spellcheck="false">Print("Hello World")
+print("I love Python!
+print "Goodbye"
+</textarea>
+        <div class="output-area">
+          <div class="output-label">OUTPUT</div>
+          <div class="output-text empty-out" id="output-4">Click Run to see output...</div>
+          <div class="mismatch-note" id="mismatch-4">⚠️ Fix all errors so the output matches exactly.</div>
+        </div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(4)">▶ Run</button>
+          <button class="btn-submit" id="submit-4" onclick="submitCode(4)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       CHAPTER 5 — MINI CHALLENGE
+  ═══════════════════════════ -->
+  <div class="chapter-screen" id="ch-5">
+    <div class="coding-wrap">
+      <div class="question-panel">
+        <div class="chapter-badge badge-practice">🏆 MINI CHALLENGE</div>
+        <div class="q-title">Your Info Card</div>
+        <div class="q-desc">
+          Print exactly 3 lines — your name, your age, and your language — each with a label.<br><br>
+          This is your final challenge for Lesson 1. Submit unlocks only when all 3 lines match the format!
+        </div>
+        <div class="expected-box">
+          <div class="expected-label">✦ EXPECTED OUTPUT FORMAT</div>
+          <div class="expected-code">Name: [Your Name]<br>Age: [Your Age]<br>Language: Python</div>
+        </div>
+        <button class="hint-btn" onclick="toggleHint('hint-5')">💡 Show Hint</button>
+        <div class="hint-box" id="hint-5">
+          <code style="font-family:'JetBrains Mono',monospace;">print("Name: Ravi")<br>print("Age: 20")<br>print("Language: Python")</code>
+        </div>
+        <div class="xp-reward">⭐ +70 XP — Lesson Complete!</div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="editor-lang">python · ch5_final.py</div>
+          <button class="editor-reset" onclick="resetCode(5)">↺ Reset</button>
+        </div>
+        <textarea class="code-area" id="code-5" spellcheck="false"># Print your info card!
+</textarea>
+        <div class="output-area">
+          <div class="output-label">OUTPUT</div>
+          <div class="output-text empty-out" id="output-5">Click Run to see output...</div>
+          <div class="mismatch-note" id="mismatch-5">⚠️ Must have Name:, Age:, and Language: Python on 3 lines.</div>
+        </div>
+        <div class="action-row">
+          <button class="btn-run" onclick="runCode(5)">▶ Run</button>
+          <button class="btn-submit" id="submit-5" onclick="submitCode(5)" disabled>✓ Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<!-- BOTTOM PROGRESS BAR -->
+<div class="bottom-bar">
+  <div class="progress-label">Chapter <span id="ch-current">1</span> of 5</div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+  <div class="progress-label" id="progress-pct">20%</div>
+</div>
+</div><!-- end shell -->
+
+<!-- CHAPTER SUCCESS OVERLAY -->
+<div class="overlay" id="ov-success">
+  <div class="overlay-box success-box">
+    <span class="ov-icon">🎉</span>
+    <div class="ov-title" id="s-title">Chapter Complete!</div>
+    <div class="ov-sub" id="s-sub">Great job! Keep going!</div>
+    <div class="ov-xp green" id="s-xp">+40 XP</div>
+    <button class="ov-btn btn-primary-ov" onclick="nextChapter()">Next Chapter →</button>
+  </div>
+</div>
+
+<!-- CONGRATULATIONS OVERLAY (all 5 done) -->
+<div class="overlay" id="ov-congrats">
+  <div class="overlay-box congrats-box">
+    <span class="ov-icon">🏆</span>
+    <div class="ov-title">Congratulations!</div>
+    <div class="confetti-row">🎊🌟✨🎉✨🌟🎊</div>
+    <div class="ov-sub">You completed Lesson 1 — Hello World! Amazing work!</div>
+    <div class="congrats-stats">
+      <div class="cs-card"><div class="cs-val" id="cg-xp">0</div><div class="cs-lbl">XP EARNED</div></div>
+      <div class="cs-card"><div class="cs-val">5</div><div class="cs-lbl">CHAPTERS DONE</div></div>
+    </div>
+    <div class="ov-xp yellow">🔥 Streak updated! Lesson 1 complete!</div>
+    <button class="ov-btn btn-green-ov" onclick="goHome()">Go to Home 🏠</button>
+  </div>
+</div>
+
+<script>
+// CQ is loaded from cq.js
+// Auth guard
+CQ.requireAuth();
+
+// Stars
+const se=document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const el=document.createElement('div');el.className='star';
+  const sz=Math.random()*2+.5;
+  el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--del:-${(Math.random()*6).toFixed(1)}s;`;
+  se.appendChild(el);
+}
+
+// ── STATE ──
+let currentChapter=1;
+let completedChapters=new Set();
+let earnedXP=0;
+let canSubmit={};
+
+const XP_PER_CHAPTER={1:30, 2:40, 3:50, 4:60, 5:70};
+
+const DEFAULTS={
+  2:'# Write your code here\nprint()',
+  3:'# Print the numbers 1 to 5\n',
+  4:'Print("Hello World")\nprint("I love Python!\nprint "Goodbye"\n',
+  5:'# Print your info card!\n'
+};
+
+function completeChapter(n) {
+  showChapterSuccess(n);
+}
+
+// ── CHAPTER NAVIGATION ──
+function goChapter(n) {
+  const maxUnlocked = completedChapters.size + 1;
+  if (n > maxUnlocked) return;
+  currentChapter = n;
+
+  document.querySelectorAll('.chapter-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('ch-' + n).classList.add('active');
+
+  document.querySelectorAll('.ch-tab').forEach((t, i) => {
+    t.classList.remove('active');
+    if (completedChapters.has(i + 1)) t.classList.add('done');
+    else t.classList.remove('done');
+  });
+  document.getElementById('tab-' + n).classList.add('active');
+
+  const pct = Math.round((n / 5) * 100);
+  document.getElementById('ch-current').textContent = n;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+// ── PYTHON SIMULATOR ──
+function simulatePython(code) {
+  const lines = code.split('\n');
+  const output = [], errors = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('#')) continue;
+
+    // Capital Print
+    if (/^Print\s*\(/.test(line)) {
+      errors.push(`Line ${i+1}: NameError — 'Print' is not defined. Use lowercase print()`);
+      continue;
+    }
+    // print without parentheses
+    if (/^print\s+["']/.test(line)) {
+      errors.push(`Line ${i+1}: SyntaxError — Missing parentheses. Use print("...")`);
+      continue;
+    }
+    // unclosed string
+    if (/print\s*\(\s*["'][^"']*$/.test(line)) {
+      errors.push(`Line ${i+1}: SyntaxError — Missing closing quote`);
+      continue;
+    }
+    // missing closing paren
+    const opens = (line.match(/\(/g)||[]).length;
+    const closes = (line.match(/\)/g)||[]).length;
+    if (opens > closes && /^print/.test(line)) {
+      errors.push(`Line ${i+1}: SyntaxError — Missing closing bracket )`);
+      continue;
+    }
+
+    // valid print()
+    const pm = line.match(/^print\s*\((.+)\)\s*$/);
+    if (pm) {
+      let val = pm[1].trim();
+      const dq = val.match(/^"(.*)"$/); if (dq) { output.push(dq[1]); continue; }
+      const sq = val.match(/^'(.*)'$/); if (sq) { output.push(sq[1]); continue; }
+      if (/^-?\d+(\.\d+)?$/.test(val)) { output.push(val); continue; }
+      // unquoted text = error
+      errors.push(`Line ${i+1}: NameError — '${val}' not defined. Did you forget quotes?`);
+      continue;
+    }
+    // empty print()
+    if (/^print\s*\(\s*\)$/.test(line)) { output.push(''); continue; }
+  }
+  return { output, errors };
+}
+
+// ── VALIDATORS — submit only if output matches ──
+const VALIDATORS = {
+  2: (out) => {
+    if (!out.length) return false;
+    return out[0].toLowerCase().includes('hello') && out[0].toLowerCase().includes('my name is');
+  },
+  3: (out) => {
+    if (out.length !== 5) return false;
+    return ['1','2','3','4','5'].every((v, i) => out[i].trim() === v);
+  },
+  4: (out) => {
+    if (out.length < 2) return false;
+    return out[0].trim() === 'Hello World' && out[1].trim() === 'I love Python!';
+  },
+  5: (out) => {
+    if (out.length < 3) return false;
+    return out[0].toLowerCase().startsWith('name:') &&
+           out[1].toLowerCase().startsWith('age:') &&
+           out[2].toLowerCase().includes('language:');
+  }
+};
+
+// ── RUN CODE ──
+function runCode(ch) {
+  const code = document.getElementById('code-' + ch).value;
+  const result = simulatePython(code);
+  const outEl = document.getElementById('output-' + ch);
+  const submitBtn = document.getElementById('submit-' + ch);
+  const mismatch = document.getElementById('mismatch-' + ch);
+
+  mismatch.classList.remove('show');
+  outEl.style.borderLeft = 'none';
+
+  if (result.errors.length > 0) {
+    // show errors — submit stays locked
+    outEl.className = 'output-text error-out';
+    outEl.innerHTML = result.errors.join('<br>');
+    submitBtn.disabled = true;
+    canSubmit[ch] = false;
+
+  } else if (result.output.length > 0) {
+    outEl.className = 'output-text';
+    outEl.innerHTML = result.output.join('<br>');
+
+    // check expected output
+    const valid = VALIDATORS[ch] ? VALIDATORS[ch](result.output) : true;
+    if (valid) {
+      canSubmit[ch] = true;
+      submitBtn.disabled = false;
+      outEl.style.borderLeft = '3px solid var(--green)';
+    } else {
+      canSubmit[ch] = false;
+      submitBtn.disabled = true;
+      mismatch.classList.add('show');
+    }
+
+  } else {
+    outEl.className = 'output-text empty-out';
+    outEl.textContent = '(no output — add something to print!)';
+    submitBtn.disabled = true;
+    canSubmit[ch] = false;
+  }
+}
+
+// ── SUBMIT ──
+function submitCode(ch) {
+  if (!canSubmit[ch]) return;
+  showChapterSuccess(ch);
+}
+
+// ── CHAPTER SUCCESS ──
+async function showChapterSuccess(ch) {
+  completedChapters.add(ch);
+  const xp = XP_PER_CHAPTER[ch] || 40;
+  earnedXP += xp;
+  document.getElementById('earned-xp').textContent = earnedXP;
+  document.getElementById('tab-' + ch).classList.add('done');
+  if (ch < 5) {
+    // Save chapter to backend (ch 5 handled in showCongrats)
+    CQ.completeChapter('python1', ch, xp);
+  }
+
+  if (ch === 5) { showCongrats(); return; }
+
+  document.getElementById('s-title').textContent = `Chapter ${ch} Complete!`;
+  document.getElementById('s-sub').textContent = `Well done! ${5 - ch} chapter${5 - ch !== 1 ? 's' : ''} to go.`;
+  document.getElementById('s-xp').textContent = `+${xp} XP`;
+  document.getElementById('ov-success').classList.add('show');
+}
+
+// ── CONGRATULATIONS ──
+async function showCongrats() {
+  // Final save to server
+  await CQ.completeChapter('python1', 5, XP_PER_CHAPTER[5]);
+  document.getElementById('cg-xp').textContent = earnedXP;
+  document.getElementById('ov-congrats').classList.add('show');
+}
+
+function goHome() {
+  document.getElementById('ov-congrats').classList.remove('show');
+  window.location.href = 'homepage.html';
+}
+
+function nextChapter() {
+  document.getElementById('ov-success').classList.remove('show');
+  goChapter(currentChapter + 1);
+}
+
+function toggleHint(id) { document.getElementById(id).classList.toggle('show'); }
+
+function resetCode(ch) {
+  document.getElementById('code-' + ch).value = DEFAULTS[ch] || '';
+  const outEl = document.getElementById('output-' + ch);
+  outEl.className = 'output-text empty-out';
+  outEl.textContent = 'Click Run to see output...';
+  outEl.style.borderLeft = 'none';
+  document.getElementById('submit-' + ch).disabled = true;
+  document.getElementById('mismatch-' + ch).classList.remove('show');
+  canSubmit[ch] = false;
+}
+
+// Tab key support
+document.querySelectorAll('.code-area').forEach(ta => {
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(ta.selectionEnd);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+  });
+});
+</script>
+</body>
+</html>
